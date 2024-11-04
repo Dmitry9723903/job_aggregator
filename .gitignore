@@ -1,0 +1,10 @@
+__pycache__
+*.sqlite3
+*.db
+.env
+.env.docker
+.env.local
+static/
+tmp/
+.idea/
+.DS_Store
