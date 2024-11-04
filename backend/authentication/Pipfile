@@ -8,6 +8,14 @@ django = "*"
 psycopg = "*"
 psycopg2 = "*"
 psycopg2-binary = "*"
+djangorestframework = "*"
+django-allauth = "*"
+django-cors-headers = "*"
+drf-yasg = "*"
+django-filter = "*"
+djangorestframework-simplejwt = "*"
+dj-rest-auth = {extras = ["with_social"], version = "*"}
+markdown = "*"
 
 [dev-packages]
 

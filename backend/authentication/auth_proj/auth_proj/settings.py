@@ -63,7 +63,7 @@ CORS_ALLOWED_ORIGINS = [f"https://{h}" for h in ALLOWED_HOSTS]
 
 # Application definition
 
-# AUTH_USER_MODEL = "job_aggr_user.User"
+# AUTH_USER_MODEL = "auth_proj.User"
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -72,7 +72,24 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'rest_framework.authtoken',
+    'django.contrib.sites',
+    # 'allauth',
+    # 'allauth.account',
+    # 'allauth.socialaccount',
+    # 'dj_rest_auth',
+    # 'dj_rest_auth.registration',
+    # 'corsheaders',
+    # 'drf_yasg',
+    # 'django_filters',
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+    ],
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
