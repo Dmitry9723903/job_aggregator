@@ -9,26 +9,61 @@ https://docs.djangoproject.com/en/5.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
-
+import os
+import pprint
 from pathlib import Path
+
+IS_PRODUCTION = bool(int(os.environ.get("IS_PRODUCTION", 1)))
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+TMP_DIR = BASE_DIR.parent / "tmp"
+FLAG_DIR = TMP_DIR / "flags"
+LOG_DIR = TMP_DIR / "log"
+STATIC_DIR = BASE_DIR / "static"
+STATIC_ROOT = BASE_DIR.parent / "static"
+MEDIA_DIR = TMP_DIR / "media"
+MEDIA_URL = "/media/"
 
+# создаем директории
+FLAG_DIR.mkdir(parents=True, exist_ok=True)
+LOG_DIR.mkdir(parents=True, exist_ok=True)
+STATIC_DIR.mkdir(parents=True, exist_ok=True)
+STATIC_ROOT.mkdir(parents=True, exist_ok=True)
+MEDIA_DIR.mkdir(parents=True, exist_ok=True)
+
+# настройки профиля
+# в будущем, данные настройки должны хранится для каждого пользователя
+PROFILE_SETTINGS = {
+    "days_out_limit": 14,
+}
+
+
+# CSRF_FAILURE_VIEW = "auth.views.error_403"
+
+# Ключ шифрования
+CRYPTO_KEY = os.environ.get("CRYPTO_KEY", os.path.join(TMP_DIR, "crypto.key"))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-wnz@xq17-q98mcnr3*$r&op+)ipo-*qa)=t@6bwi114g0yuumn'
+SECRET_KEY = os.environ.get(
+    "SECRET_KEY", "django-insecure-wnz@xq17-q98mcnr3*$r&op+)ipo-*qa)=t@6bwi114g0yuumn"
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "127.0.0.1",
+]
 
+CORS_ALLOWED_ORIGINS = [f"https://{h}" for h in ALLOWED_HOSTS]
 
 # Application definition
+
+AUTH_USER_MODEL = "ka_user.User"
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -49,12 +84,20 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+SESSION_COOKIE_SECURE = IS_PRODUCTION
+CSRF_COOKIE_SECURE = IS_PRODUCTION
+CSRF_TRUSTED_ORIGINS = CORS_ALLOWED_ORIGINS
+
 ROOT_URLCONF = 'auth_project.urls'
+
+TEMPLATE_DIR = os.path.join(BASE_DIR, "templates")
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            TEMPLATE_DIR,
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -74,9 +117,14 @@ WSGI_APPLICATION = 'auth_project.wsgi.application'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+    "default":{
+        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        "NAME": os.environ.get("DB_NAME", "ka_db"),
+        "USER": os.environ.get("DB_USER", "developer"),
+        "PASSWORD": os.environ.get("DB_PASSWORD", "1"),
+        "HOST": os.environ.get("DB_HOST", "127.0.0.1"),
+        "PORT": os.environ.get("DB_PORT", 5432),
+        "TIME_ZONE": "Europe/Moscow",
     }
 }
 
@@ -103,19 +151,112 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
-
-TIME_ZONE = 'UTC'
-
+LANGUAGE_CODE = "ru-Ru"
+TIME_ZONE = "Europe/Moscow"
 USE_I18N = True
-
 USE_TZ = True
+
+LOCALE_PATHS = [os.path.join(BASE_DIR, "i18n")]
+LANGUAGES = [
+    ("ru", "Russian"),
+]
+
+LOGGING_LEVEL = "DEBUG" if DEBUG else "INFO"
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "root": {"level": LOGGING_LEVEL, "handlers": ["console", "logfile"]},
+    "formatters": {
+        "verbose": {
+            "format": "%(levelname)-8s %(asctime).19s %(module)s\t%(name)s\t%(message)s"
+        },
+        "simple": {"format": "%(levelname)-8s %(module)s\t%(name)s\t%(message)s"},
+    },
+    "handlers": {
+        "console": {"class": "logging.StreamHandler", "formatter": "simple"},
+        "logfile": {
+            "level": "ERROR",
+            "class": "logging.FileHandler",
+            "filename": os.path.join(TMP_DIR, "error.log"),
+            "formatter": "verbose",
+        },
+        # "celery": {
+        #     "level": "WARNING",
+        #     "class": "logging.FileHandler",
+        #     "filename": os.path.join(TMP_DIR, "celery.log"),
+        #     "formatter": "verbose",
+        # },
+        "api": {
+            "level": "INFO",
+            "class": "logging.FileHandler",
+            "filename": os.path.join(TMP_DIR, "api.log"),
+            "formatter": "verbose",
+        },
+        "null": {
+            "class": "logging.NullHandler",
+        },
+    },
+    "loggers": {
+        "django.db.backends": {  # отладка запросов к БД
+            "handlers": [
+                "console",
+            ],
+            "level": "ERROR",
+            "propagate": False,
+        },
+        "django": {
+            "handlers": ["console"],
+            "level": "ERROR",
+            "propagate": False,
+        },
+        # "mp.tasks": {
+        #     "handlers": ["celery"],
+        #     "level": LOGGING_LEVEL,
+        # },
+        "api": {
+            "handlers": ["console", "logfile", "api"],
+            "level": LOGGING_LEVEL,
+            "propagate": False,
+        },
+        "": {
+            "handlers": ["console", "logfile"],
+            "level": LOGGING_LEVEL,
+            "propagate": False,
+        },
+        "httpx": {
+            "handlers": ["console"],
+            "level": "ERROR",
+            "propagate": False,
+        },
+        "httpcore": {
+            "handlers": ["console"],
+            "level": "ERROR",
+            "propagate": False,
+        },
+        "urllib3": {
+            "handlers": ["console"],
+            "level": "ERROR",
+            "propagate": False,
+        },
+        "hpack": {
+            "handlers": ["console"],
+            "level": "ERROR",
+            "propagate": False,
+        },
+        # "pika": {
+        #     "handlers": [],
+        #     "level": "ERROR",
+        #     "propagate": False,
+        # },
+    },
+}
 
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = "static/"
+STATICFILES_DIRS = [STATIC_DIR]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
