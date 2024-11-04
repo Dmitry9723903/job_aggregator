@@ -63,7 +63,7 @@ CORS_ALLOWED_ORIGINS = [f"https://{h}" for h in ALLOWED_HOSTS]
 
 # Application definition
 
-AUTH_USER_MODEL = "ka_user.User"
+AUTH_USER_MODEL = "job_aggr_user.User"
 
 INSTALLED_APPS = [
     'django.contrib.admin',
