@@ -119,8 +119,8 @@ WSGI_APPLICATION = 'auth_project.wsgi.application'
 DATABASES = {
     "default":{
         "ENGINE": "django.db.backends.postgresql_psycopg2",
-        "NAME": os.environ.get("DB_NAME", "ka_db"),
-        "USER": os.environ.get("DB_USER", "developer"),
+        "NAME": os.environ.get("DB_NAME", "job_aggr_auth"),
+        "USER": os.environ.get("DB_USER", "dev_auth_user"),
         "PASSWORD": os.environ.get("DB_PASSWORD", "1"),
         "HOST": os.environ.get("DB_HOST", "127.0.0.1"),
         "PORT": os.environ.get("DB_PORT", 5432),
