@@ -1,0 +1,57 @@
+.
+├── authentication
+│   ├── auth_proj
+│   │   ├── auth
+│   │   │   ├── __init__.py
+│   │   │   ├── models.py
+│   │   │   ├── subscription
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── migrations
+│   │   │   │   │   └── __init__.py
+│   │   │   │   └── models.py
+│   │   │   └── user
+│   │   │       ├── helpers
+│   │   │       │   └── __init__.py
+│   │   │       ├── __init__.py
+│   │   │       ├── migrations
+│   │   │       │   └── __init__.py
+│   │   │       ├── models.py
+│   │   │       ├── serializers.py
+│   │   │       └── viewsets.py
+│   │   ├── auth_proj
+│   │   │   ├── asgi.py
+│   │   │   ├── helpers
+│   │   │   │   ├── constants.py
+│   │   │   │   ├── filelogger.py
+│   │   │   │   ├── flag.py
+│   │   │   │   └── __init__.py
+│   │   │   ├── __init__.py
+│   │   │   ├── __pycache__
+│   │   │   │   ├── __init__.cpython-312.pyc
+│   │   │   │   ├── settings.cpython-312.pyc
+│   │   │   │   ├── urls.cpython-312.pyc
+│   │   │   │   └── wsgi.cpython-312.pyc
+│   │   │   ├── settings.py
+│   │   │   ├── urls.py
+│   │   │   ├── viewsets.py
+│   │   │   └── wsgi.py
+│   │   ├── manage.py
+│   │   └── static
+│   ├── Pipfile
+│   ├── Pipfile.lock
+│   ├── README.md
+│   ├── static
+│   └── tmp
+│       ├── api.log
+│       ├── error.log
+│       ├── flags
+│       ├── log
+│       └── media
+├── authorization
+├── data_collection
+├── data_processing
+├── notification
+├── output.txt
+└── payment_service
+
+23 directories, 32 files
