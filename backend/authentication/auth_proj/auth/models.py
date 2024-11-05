@@ -5,7 +5,7 @@ from django.contrib.auth.models import (
     BaseUserManager,
     PermissionsMixin,
 )
-from auth_proj.auth.user.models import User
+from auth.user.models import User
 
 
 class Session(models.Model):
