@@ -16,15 +16,23 @@ Including another URLconf
 """
 from django.urls import path, include
 from django.contrib import admin
+
 from django.urls import include, path
 from rest_framework import routers, serializers, viewsets
+from auth_app.viewsets import UserViewSet, SessionViewSet, RoleViewSet, UserRoleViewSet, UserPermissionViewSet
 
 router = routers.DefaultRouter()
+router.register(r'users', UserViewSet)
+router.register(r'sessions', SessionViewSet)
+router.register(r'roles', RoleViewSet)
+router.register(r'user-roles', UserRoleViewSet)
+router.register(r'user-permissions', UserPermissionViewSet)
 
 urlpatterns = [
-    path("admin/", admin.site.urls),
     path('', include(router.urls)),
-    # path('api-auth/', include('rest_framework.urls')),
-    # path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-    # path('dj-rest-auth/registration/', include('dj_rest_auth.registration.urls')),
+    path('api/', include(router.urls)),
+    # path("admin/", admin.site.urls),
+    # path('api-auth_apps/', include('rest_framework.urls')),
+    # path('api-auth_apps/', include('rest_framework.urls', namespace='rest_framework')),
+    # path('dj-rest-auth_apps/registration/', include('dj_rest_auth.registration.urls')),
 ]

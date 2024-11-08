@@ -39,7 +39,7 @@ PROFILE_SETTINGS = {
 }
 
 
-# CSRF_FAILURE_VIEW = "auth.views.error_403"
+# CSRF_FAILURE_VIEW = "auth_app.views.error_403"
 
 # Ключ шифрования
 CRYPTO_KEY = os.environ.get("CRYPTO_KEY", os.path.join(TMP_DIR, "crypto.key"))
@@ -63,9 +63,10 @@ CORS_ALLOWED_ORIGINS = [f"https://{h}" for h in ALLOWED_HOSTS]
 
 # Application definition
 
-# AUTH_USER_MODEL = "auth_proj.User"
+AUTH_USER_MODEL = "auth_app.User"
 
 INSTALLED_APPS = [
+    'auth_app.apps.AuthAppConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -75,14 +76,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'django.contrib.sites',
-    # 'allauth',
-    # 'allauth.account',
-    # 'allauth.socialaccount',
-    # 'dj_rest_auth',
-    # 'dj_rest_auth.registration',
-    # 'corsheaders',
-    # 'drf_yasg',
-    # 'django_filters',
 ]
 
 REST_FRAMEWORK = {
@@ -99,6 +92,9 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
 ]
 
 SESSION_COOKIE_SECURE = IS_PRODUCTION
