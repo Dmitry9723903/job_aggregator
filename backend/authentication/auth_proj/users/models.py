@@ -26,42 +26,37 @@ class LowercaseEmailField(models.EmailField):
 
 
 class UserManager(BaseUserManager):
-    def create_user(self, email, password=None, **kwargs):
+    def create_user(self, email, password=None, **extra_fields):
         """Create and return a `User` with an email, phone number, username and password."""
         if email is None:
-            raise TypeError("Users must have an email.")
+            raise TypeError("The Email field must be set.")
 
-        user = self.model(email=self.normalize_email(email.lower()))
+        # user = self.model(email=self.normalize_email(email.lower()))
+        user = self.model(email=email, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
 
         return user
 
-    def create_superuser(self, email, password):
+    def create_superuser(self, email, password=None, **extra_fields):
         """
         Create and return a `User` with superuser (admin) permissions.
         """
-        if password is None:
-            raise TypeError("Superusers must have a password.")
-        if email is None:
-            raise TypeError("Superusers must have an email.")
-
-        user = self.create_user(email, password)
-        user.is_superuser = True
-        user.is_staff = True
-        user.save(using=self._db)
-
-        return user
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+        return self.create_user(email, password, **extra_fields)
 
 
 class User(AbstractBaseUser, PermissionsMixin):
+    email = LowercaseEmailField(unique=True)
     username = models.CharField(db_index=True, max_length=255, null=True, blank=True)
     first_name = models.CharField(max_length=150, default="", blank=True)
     last_name = models.CharField(max_length=150, default="", blank=True)
-    email = LowercaseEmailField(db_index=True, unique=True, null=True)
-    is_staff = models.BooleanField(default=False)
+
+    referral_code = models.CharField(max_length=100, blank=True)
+    referred_by = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True)
     is_active = models.BooleanField(default=True)
-    is_subscribed = models.BooleanField(default=False)
+    is_staff = models.BooleanField(default=False)
 
     options = models.JSONField(null=True, blank=True)
 
@@ -110,30 +105,10 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 
 class Session(models.Model):
+    objects = None
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     session_token = models.CharField(max_length=255)
     expires_at = models.DateTimeField()
 
-
-class Role(models.Model):
-    role_name = models.CharField(max_length=255)
-
-
-class UserRole(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    role = models.ForeignKey(Role, on_delete=models.CASCADE)
-
-    class Meta:
-        unique_together = ('user', 'role')
-
-
-class Permission(models.Model):
-    permission_name = models.CharField(max_length=255)
-
-
-class UserPermission(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    permission = models.ForeignKey(Permission, on_delete=models.CASCADE)
-
-    class Meta:
-        unique_together = ('user', 'permission')
+    def __str__(self):
+        return f"Session for {self.user.email}"
