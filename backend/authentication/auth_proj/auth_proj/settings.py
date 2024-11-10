@@ -39,7 +39,7 @@ PROFILE_SETTINGS = {
 }
 
 
-# CSRF_FAILURE_VIEW = "auth_app.views.error_403"
+# CSRF_FAILURE_VIEW = "users.views.error_403"
 
 # Ключ шифрования
 CRYPTO_KEY = os.environ.get("CRYPTO_KEY", os.path.join(TMP_DIR, "crypto.key"))
@@ -56,32 +56,44 @@ SECRET_KEY = os.environ.get(
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    "127.0.0.1",
+    '127.0.0.1',
+    'localhost',
+    'localhost:8000',
+    # "http://localhost:8000/api/auth/register/",
+    # "http://localhost:8000/swagger/",
 ]
 
 CORS_ALLOWED_ORIGINS = [f"https://{h}" for h in ALLOWED_HOSTS]
 
 # Application definition
 
-AUTH_USER_MODEL = "auth_app.User"
+AUTH_USER_MODEL = "users.User"
+
+# SITE_ID = 1
 
 INSTALLED_APPS = [
-    'auth_app.apps.AuthAppConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # 'django.contrib.sites',
     'rest_framework',
-    'rest_framework.authtoken',
+    'rest_framework_simplejwt',
+    # 'rest_framework.authtoken',
     'django.contrib.sites',
+    # 'django_rename_app',
+    'users.apps.AuthAppConfig',
 ]
 
 REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
-    ],
+    # 'DEFAULT_PERMISSION_CLASSES': [
+    #     'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+    # ],
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
 }
 
 MIDDLEWARE = [
@@ -95,6 +107,7 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    # 'django_rename_app.middleware.ModelAdminReorder',
 ]
 
 SESSION_COOKIE_SECURE = IS_PRODUCTION
@@ -175,6 +188,7 @@ LANGUAGES = [
 ]
 
 LOGGING_LEVEL = "DEBUG" if DEBUG else "INFO"
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -222,10 +236,6 @@ LOGGING = {
             "level": "ERROR",
             "propagate": False,
         },
-        # "mp.tasks": {
-        #     "handlers": ["celery"],
-        #     "level": LOGGING_LEVEL,
-        # },
         "api": {
             "handlers": ["console", "logfile", "api"],
             "level": LOGGING_LEVEL,
@@ -256,17 +266,9 @@ LOGGING = {
             "level": "ERROR",
             "propagate": False,
         },
-        # "pika": {
-        #     "handlers": [],
-        #     "level": "ERROR",
-        #     "propagate": False,
-        # },
     },
 }
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = "static/"
 STATICFILES_DIRS = [STATIC_DIR]
