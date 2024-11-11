@@ -53,17 +53,20 @@ class User(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(max_length=150, default="", blank=True)
     last_name = models.CharField(max_length=150, default="", blank=True)
 
-    referral_code = models.CharField(max_length=100, blank=True)
+    # Добавленные поля для hh.ru
+    hh_client_id = models.CharField(max_length=255, null=True, blank=True)
+    hh_client_secret = models.CharField(max_length=255, null=True, blank=True)
+    hh_access_token = models.CharField(max_length=255, null=True, blank=True)
+    hh_refresh_token = models.CharField(max_length=255, null=True, blank=True)
+    hh_state = models.CharField(max_length=255, null=True, blank=True)  # Для хранения state параметра
+    hh_redirect_uri = models.CharField(max_length=255, null=True, blank=True)  # Для хранения redirect_uri параметра
+
+    referral_code = models.CharField(max_length=150, blank=True, null=True, unique=True)
     referred_by = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
 
     options = models.JSONField(null=True, blank=True)
-
-    referral_code = models.CharField(max_length=150, blank=True, null=True, unique=True)
-    referred_by = models.ForeignKey(
-        "User", on_delete=models.SET_NULL, blank=True, null=True
-    )
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
